@@ -1,14 +1,53 @@
-import { Button, Icon, Layout, Text } from '@ui-kitten/components'
 import React from 'react'
+import { getProductsByPage } from '../../../actions/products/get-products-by-page';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { MainLayout } from '../../layouts/MainLayout';
+import { FullScreenLoader } from '../../components/ui/FullScreenLoader';
+import { ProductsList } from '../../components/products/ProductsList';
+import { FAB } from '../../components/ui/FAB';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { RootStackParams } from '../../navigation/StackNavigator';
 
 export const HomeScreen = () => {
-  return (
-    <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <Text>HomeScreen</Text>
+  
+  const navigation = useNavigation<NavigationProp<RootStackParams>>();
 
-        <Button accessoryLeft={<Icon name='facebook'/>}>
-          Cerrar sesión
-        </Button>
-    </Layout>
+  // const {  isLoading, data: products = [] } = useQuery({
+  //   queryKey: ['products', 'infinite'],
+  //   staleTime: 1000 * 60 * 60, //1 hour
+  //   queryFn: () => getProductsByPage(0),
+  // });  
+
+  const {  isLoading, data, fetchNextPage } = useInfiniteQuery({
+    queryKey: ['products', 'infinite'],
+    staleTime: 1000 * 60 * 60, //1 hour
+    initialPageParam: 0,
+    queryFn: async(params) => await getProductsByPage(params.pageParam),    
+    getNextPageParam: (lastPage, allPages) => allPages.length,
+  });  
+
+  return (
+    <>
+      <MainLayout
+        title='TesloShop - Products'
+        subTitle='Aplicación administrativa'>      
+          {
+            isLoading 
+              ? (<FullScreenLoader/>) 
+              : <ProductsList products={data?.pages.flat() ?? []} 
+                  fetchNextPage ={ fetchNextPage }
+                />
+          }        
+      </MainLayout>
+      <FAB
+          iconName='plus-outline'
+          onPress={()=>navigation.navigate('ProductScreen', {productId: 'new'})}
+          style={{
+            position: 'absolute',
+            bottom: 30,
+            right: 20,
+          }}
+      />
+    </>
   )
 }
