@@ -1,4 +1,4 @@
-import { Layout, Spinner, Text } from '@ui-kitten/components'
+import { Layout, Spinner } from '@ui-kitten/components'
 import React from 'react'
 
 export const LoadingScreen = () => {

@@ -7,6 +7,7 @@ import { ProductsList } from '../../components/products/ProductsList';
 import { FAB } from '../../components/ui/FAB';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParams } from '../../navigation/StackNavigator';
+import { BottomNavigationTab, Text } from '@ui-kitten/components';
 
 export const HomeScreen = () => {
   
@@ -29,8 +30,8 @@ export const HomeScreen = () => {
   return (
     <>
       <MainLayout
-        title='TesloShop - Products'
-        subTitle='Aplicación administrativa'>      
+        title='TesloShop - Productos'
+        subTitle='Compra en TesloShop'>      
           {
             isLoading 
               ? (<FullScreenLoader/>) 
@@ -38,16 +39,7 @@ export const HomeScreen = () => {
                   fetchNextPage ={ fetchNextPage }
                 />
           }        
-      </MainLayout>
-      <FAB
-          iconName='plus-outline'
-          onPress={()=>navigation.navigate('ProductScreen', {productId: 'new'})}
-          style={{
-            position: 'absolute',
-            bottom: 30,
-            right: 20,
-          }}
-      />
+      </MainLayout>      
     </>
   )
 }

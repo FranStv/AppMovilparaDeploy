@@ -4,13 +4,17 @@ import { LoginScreen } from '../screens/auth/LoginScreen';
 import { RegisterScreen } from '../screens/auth/RegisterScreen';
 import { HomeScreen } from '../screens/home/HomeScreen';
 import { ProductScreen } from '../screens/product/ProductScreen';
+import { ShoppingCar } from '../screens/shoppingCar/ShoppingCar';
+import { AddProductScreen } from '../screens/product/AddProductScreen';
 
 export type RootStackParams = {
     LoadingScreen: undefined,
     LoginScreen: undefined,
     RegisterScreen: undefined,
     HomeScreen: undefined,
+    ShoppingCar: undefined,
     ProductScreen: { productId: string },
+    AddProductScreen: { productId: string },
 }
 
 const Stack = createStackNavigator<RootStackParams>();
@@ -48,8 +52,16 @@ export const StackNavigator = () => {
         name="HomeScreen" 
         component={HomeScreen} />
       <Stack.Screen 
+        options={{ cardStyleInterpolator: fadeAnimation }} 
+        name="ShoppingCar" 
+        component={ShoppingCar} />
+      <Stack.Screen 
       name="ProductScreen" 
       component={ProductScreen} />
+      <Stack.Screen 
+        options={{ cardStyleInterpolator: fadeAnimation }} 
+        name="AddProductScreen" 
+        component={AddProductScreen} />
     </Stack.Navigator>
   );
 }

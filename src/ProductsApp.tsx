@@ -11,6 +11,8 @@ import { StackNavigator } from './presentation/navigation/StackNavigator';
 import { useColorScheme } from 'react-native';
 import { AuthProvider } from './presentation/providers/AuthProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { StripeProvider } from '@stripe/stripe-react-native';
+import { STRIPE_PUBLISHABLE_KEY, API_URL_ANDROID, API_URL } from '@env';
 
 const queryClient = new QueryClient();
 
@@ -36,6 +38,7 @@ export const ProductsApp = () => {
 };
 
   return (
+    <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
     <QueryClientProvider client={queryClient}>
       <IconRegistry icons={EvaIconsPack} />
       <ApplicationProvider 
@@ -45,9 +48,12 @@ export const ProductsApp = () => {
       >
         <AuthProvider>
           <StackNavigator/>  
+          <Text>{API_URL}</Text>
+          <Text>{API_URL_ANDROID}</Text>
         </AuthProvider>          
         </NavigationContainer>
       </ApplicationProvider>
     </QueryClientProvider>
+    </StripeProvider>
   )
 }

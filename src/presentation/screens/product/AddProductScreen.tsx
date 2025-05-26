@@ -1,7 +1,6 @@
 import {
   Button,
   ButtonGroup,
-  Icon,
   Input,
   Layout,
   Text,
@@ -14,26 +13,21 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 
 import {getProductById, updateCreateProduct} from '../../../actions/products';
 
-import {useRef, useState} from 'react';
+import {useRef} from 'react';
 import {ScrollView} from 'react-native-gesture-handler';
 import {Product} from '../../../domain/entities/product';
 import {MyIcon} from '../../components/ui/MyIcon';
 import {Formik} from 'formik';
 import {ProductsImages} from '../../components/products/ProductsImages';
 import {genders, sizes} from '../../../config/constants/constants';
-import {CameraAdapter} from '../../../config/adapters/camera-adapter';
-import {useCartStore} from '../../store/auth/useCartStore';
+import { CameraAdapter } from '../../../config/adapters/camera-adapter';
 
-interface Props extends StackScreenProps<RootStackParams, 'ProductScreen'> {}
+interface Props extends StackScreenProps<RootStackParams, 'AddProductScreen'> {}
 
-export const ProductScreen = ({route}: Props) => {
+export const AddProductScreen = ({route}: Props) => {
   const productIdRef = useRef(route.params.productId);
   const theme = useTheme();
   const queryClient = useQueryClient();
-
-  const [numberItem, setNumberItem] = useState('1');
-
-  const {addItem} = useCartStore();
 
   const {data: product} = useQuery({
     queryKey: ['product', productIdRef.current],
@@ -54,31 +48,20 @@ export const ProductScreen = ({route}: Props) => {
     return <MainLayout title="Cargando... " />;
   }
 
-  const handleAddToCart = () => {
-    addItem({
-      id: product.id,
-      title: product.title,
-      price: product.price,
-      quantity: Number(numberItem),
-      image: product.images?.[0],      
-      size: product.sizes[0] ?? undefined,
-      gender: product.gender,
-    });
-  };
-
   return (
     <Formik
       initialValues={product}
       onSubmit={values => mutations.mutate(values)}>
-      {({handleChange, handleSubmit, values, setFieldValue}) => (
-        <MainLayout
-          title={values.title}
+      {({handleChange, handleSubmit, values, errors, setFieldValue}) => (
+        <MainLayout 
+          title={values.title} 
           subTitle={`Precio: ${values?.price}`}
           rightAction={async () => {
-            const photos = await CameraAdapter.getPicturesFromLibrary();
-            setFieldValue('images', [...values.images, ...photos]);
+            const photos =  await CameraAdapter.getPicturesFromLibrary();
+            setFieldValue('images', [...values.images, ...photos])
           }}
-          rightActionIcon="image-outline">
+          rightActionIcon='image-outline'
+        >
           <ScrollView style={{flex: 1}}>
             <Layout
               style={{
@@ -93,7 +76,6 @@ export const ProductScreen = ({route}: Props) => {
               {/* Formulario */}
               <Input
                 label="Título"
-                readOnly
                 style={{marginVertical: 5}}
                 value={values.title}
                 onChangeText={handleChange('title')}
@@ -101,7 +83,6 @@ export const ProductScreen = ({route}: Props) => {
 
               <Input
                 label="Slug"
-                readOnly
                 style={{marginVertical: 5}}
                 value={values.slug}
                 onChangeText={handleChange('slug')}
@@ -111,7 +92,6 @@ export const ProductScreen = ({route}: Props) => {
                 label="Descripción"
                 multiline
                 numberOfLines={5}
-                readOnly
                 style={{marginVertical: 5}}
                 value={values.description}
                 onChangeText={handleChange('description')}
@@ -128,7 +108,6 @@ export const ProductScreen = ({route}: Props) => {
               }}>
               <Input
                 label="Precio"
-                readOnly
                 style={{flex: 1}}
                 value={values.price.toString()}
                 onChangeText={handleChange('price')}
@@ -137,9 +116,8 @@ export const ProductScreen = ({route}: Props) => {
 
               <Input
                 label="Inventario"
-                readOnly
                 style={{flex: 1}}
-                value={product.stock.toString()}
+                value={values.stock.toString()}
                 onChangeText={handleChange('stock')}
                 keyboardType="numeric"
               />
@@ -191,77 +169,15 @@ export const ProductScreen = ({route}: Props) => {
               ))}
             </ButtonGroup>
 
-            {/* <Button
+            <Button
               accessoryLeft={<MyIcon name="save-outline" white />}
               onPress={() => handleSubmit()}
               disabled={mutations.isPending}
               style={{margin: 15}}>
               Guardar
-            </Button> */}
+            </Button>
 
-            {product.stock === 0 || (Number(numberItem) > product.stock) ? (
-              <Layout
-                style={{
-                  backgroundColor: theme['color-danger-100'],
-                  borderRadius: 12,
-                  padding: 15,
-                  marginHorizontal: 15,
-                  marginTop: 20,
-                  marginBottom: 10,
-                  alignItems: 'center',
-                  flexDirection: 'row',
-                  gap: 10,
-                }}>
-                <Icon
-                  name="alert-circle-outline"
-                  fill={theme['color-danger-500']}
-                  style={{width: 24, height: 24}}
-                />
-                <Text status="danger" category="s1" numberOfLines={2}>
-                  {product.stock === 0
-                    ? 'No hay stock disponible de este producto'
-                    : 'La cantidad supera el stock disponible'}
-                </Text>
-              </Layout>
-            ) : undefined}
-
-            <Layout
-              style={{
-                marginVertical: 25,
-                marginHorizontal: 15,
-                flexDirection: 'row',
-                gap: 10,
-              }}>
-              <Input
-                label="Cantidad"
-                disabled={product.stock === 0}
-                value={numberItem}
-                style={{flex: 1, width: '10%'}}
-                keyboardType="numeric"
-                onChangeText={text => {
-                  let value = text.replace(/[^0-9]/g, '');
-                  if (parseInt(value, 10) < 0) value = '1';                  
-                  setNumberItem(value);
-                  values.stock = product.stock - Number(value);
-                }}
-              />
-
-              <Button
-                accessoryLeft={<MyIcon name="shopping-cart-outline" white />}
-                onPress={() => {
-                  handleAddToCart(); // Luego agregar al carrito
-                  // handleSubmit(); // Si quieres guardar/actualizar el producto primero                  
-                }}
-                status="info"
-                disabled={
-                  product.stock === 0 ||
-                  Number(numberItem) < 1 ||
-                  Number(numberItem) > product.stock || mutations.isPending
-                }
-                style={{flex: 1, width: '100%'}}>
-                Agregar al carrito
-              </Button>
-            </Layout>            
+            {/* <Text>{ JSON.stringify(values, null, 2) }</Text> */}
           </ScrollView>
         </MainLayout>
       )}
