@@ -48,8 +48,8 @@ export const ProductsApp = () => {
       >
         <AuthProvider>
           <StackNavigator/>  
-          <Text>{API_URL}</Text>
-          <Text>{API_URL_ANDROID}</Text>
+          {/* <Text>{API_URL}</Text>
+          <Text>y luegoo {API_URL_ANDROID}</Text> */}
         </AuthProvider>          
         </NavigationContainer>
       </ApplicationProvider>
