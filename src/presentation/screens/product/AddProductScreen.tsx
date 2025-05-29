@@ -45,7 +45,7 @@ export const AddProductScreen = ({route}: Props) => {
   });
 
   if (!product) {
-    return <MainLayout title="Cargando... " />;
+    return <MainLayout/>;
   }
 
   return (
@@ -53,9 +53,7 @@ export const AddProductScreen = ({route}: Props) => {
       initialValues={product}
       onSubmit={values => mutations.mutate(values)}>
       {({handleChange, handleSubmit, values, errors, setFieldValue}) => (
-        <MainLayout 
-          title={values.title} 
-          subTitle={`Precio: ${values?.price}`}
+        <MainLayout           
           rightAction={async () => {
             const photos =  await CameraAdapter.getPicturesFromLibrary();
             setFieldValue('images', [...values.images, ...photos])

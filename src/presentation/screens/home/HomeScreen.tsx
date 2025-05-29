@@ -29,9 +29,7 @@ export const HomeScreen = () => {
 
   return (
     <>
-      <MainLayout
-        title='TesloShop - Productos'
-        subTitle='Compra en TesloShop'>      
+      <MainLayout>      
           {
             isLoading 
               ? (<FullScreenLoader/>) 

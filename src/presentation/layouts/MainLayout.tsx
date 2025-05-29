@@ -17,18 +17,13 @@ import { ShoppingCar } from '../screens/shoppingCar/ShoppingCar';
 import { FAB } from '../components/ui/FAB';
 
 interface Props {
-  title: string;
-  subTitle?: string;
-
   rightAction?: () => void;
   rightActionIcon?: string;
 
   children?: React.ReactNode;
 }
 
-export const MainLayout = ({
-  title,
-  subTitle,
+export const MainLayout = ({  
   rightAction,
   rightActionIcon = 'log-out-outline',
   children,
@@ -64,8 +59,8 @@ export const MainLayout = ({
   return (
     <Layout style={{flex: 1, paddingTop: top}}>
       <TopNavigation
-        title={title}
-        subtitle={subTitle}
+        title='TesloShop - Productos'
+        subtitle='Compra en TesloShop'
         alignment="center"
         accessoryLeft={(canGoBack() && selectedIndex===0) ? renderBackAction : undefined}
         accessoryRight={() => <RenderRightAction />}

@@ -22,7 +22,7 @@ import {Formik} from 'formik';
 import {ProductsImages} from '../../components/products/ProductsImages';
 import {genders, sizes} from '../../../config/constants/constants';
 import {CameraAdapter} from '../../../config/adapters/camera-adapter';
-import {useCartStore} from '../../store/auth/useCartStore';
+import {useCartStore} from '../../store/car/useCartStore';
 
 interface Props extends StackScreenProps<RootStackParams, 'ProductScreen'> {}
 
@@ -51,7 +51,7 @@ export const ProductScreen = ({route}: Props) => {
   });
 
   if (!product) {
-    return <MainLayout title="Cargando... " />;
+    return <MainLayout />;
   }
 
   const handleAddToCart = () => {
@@ -60,7 +60,7 @@ export const ProductScreen = ({route}: Props) => {
       title: product.title,
       price: product.price,
       quantity: Number(numberItem),
-      image: product.images?.[0],      
+      image: product.images?.[0],
       size: product.sizes[0] ?? undefined,
       gender: product.gender,
     });
@@ -72,8 +72,6 @@ export const ProductScreen = ({route}: Props) => {
       onSubmit={values => mutations.mutate(values)}>
       {({handleChange, handleSubmit, values, setFieldValue}) => (
         <MainLayout
-          title={values.title}
-          subTitle={`Precio: ${values?.price}`}
           rightAction={async () => {
             const photos = await CameraAdapter.getPicturesFromLibrary();
             setFieldValue('images', [...values.images, ...photos]);
@@ -99,13 +97,13 @@ export const ProductScreen = ({route}: Props) => {
                 onChangeText={handleChange('title')}
               />
 
-              <Input
+              {/* <Input
                 label="Slug"
                 readOnly
                 style={{marginVertical: 5}}
                 value={values.slug}
                 onChangeText={handleChange('slug')}
-              />
+              /> */}
 
               <Input
                 label="Descripción"
@@ -199,7 +197,7 @@ export const ProductScreen = ({route}: Props) => {
               Guardar
             </Button> */}
 
-            {product.stock === 0 || (Number(numberItem) > product.stock) ? (
+            {product.stock === 0 || Number(numberItem) > product.stock ? (
               <Layout
                 style={{
                   backgroundColor: theme['color-danger-100'],
@@ -240,7 +238,7 @@ export const ProductScreen = ({route}: Props) => {
                 keyboardType="numeric"
                 onChangeText={text => {
                   let value = text.replace(/[^0-9]/g, '');
-                  if (parseInt(value, 10) < 0) value = '1';                  
+                  if (parseInt(value, 10) < 0) value = '1';
                   setNumberItem(value);
                   values.stock = product.stock - Number(value);
                 }}
@@ -250,18 +248,19 @@ export const ProductScreen = ({route}: Props) => {
                 accessoryLeft={<MyIcon name="shopping-cart-outline" white />}
                 onPress={() => {
                   handleAddToCart(); // Luego agregar al carrito
-                  // handleSubmit(); // Si quieres guardar/actualizar el producto primero                  
+                  // handleSubmit(); // Si quieres guardar/actualizar el producto primero
                 }}
                 status="info"
                 disabled={
                   product.stock === 0 ||
                   Number(numberItem) < 1 ||
-                  Number(numberItem) > product.stock || mutations.isPending
+                  Number(numberItem) > product.stock ||
+                  mutations.isPending
                 }
                 style={{flex: 1, width: '100%'}}>
                 Agregar al carrito
               </Button>
-            </Layout>            
+            </Layout>
           </ScrollView>
         </MainLayout>
       )}

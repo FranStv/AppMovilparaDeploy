@@ -2,8 +2,9 @@ import React, {useState} from 'react';
 import {Layout, List, Text, Button, Input, Card} from '@ui-kitten/components';
 import {View, Modal, StyleSheet} from 'react-native';
 import {FadeInImage} from '../../components/ui/FadeInImage';
-import {useCartStore} from '../../store/auth/useCartStore';
+import {useCartStore} from '../../store/car/useCartStore';
 import {CardField} from '@stripe/stripe-react-native';
+import {handlePay} from '../../store/pay/usePayStore';
 
 const styles = StyleSheet.create({
   overlay: {
@@ -36,20 +37,20 @@ export const ShoppingCar = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'oxxo'>('card');
   const [cardDetails, setCardDetails] = useState<any>(null);
+  // const [loadingPay, setLoadingPay] = useState(false);
 
   // Estados nuevos para inputs personalizados
   const [name, setName] = useState('');
-  const [expiry, setExpiry] = useState('');
-  const [cvc, setCvc] = useState('');
+  // const [expiry, setExpiry] = useState('');
+  // const [cvc, setCvc] = useState('');
 
   // Validaciones
-  const isValidExpiry = (value: string) => {
-    if (!/^\d{2}\/\d{2}$/.test(value)) return false;
-    const [mm, aa] = value.split('/').map(Number);
-    return mm >= 1 && mm <= 12;
-  };
-  const isValid =    
-    cardDetails?.complete;
+  // const isValidExpiry = (value: string) => {
+  //   if (!/^\d{2}\/\d{2}$/.test(value)) return false;
+  //   const [mm, aa] = value.split('/').map(Number);
+  //   return mm >= 1 && mm <= 12;
+  // };
+  // const isValid = cardDetails?.complete;
 
   const renderItem = ({item}: any) => (
     <Card style={{margin: 6}}>
@@ -164,7 +165,7 @@ export const ShoppingCar = () => {
                   autoCapitalize="words"
                   autoComplete="name"
                 />
-                <View style={{flexDirection: 'row', gap: 10}}>
+                {/* <View style={{flexDirection: 'row', gap: 10}}>
                   <Input
                     label="MM/AA"
                     placeholder="MM/AA"
@@ -196,7 +197,7 @@ export const ShoppingCar = () => {
                     keyboardType="numeric"
                     maxLength={3}
                   />
-                </View>
+                </View> */}
 
                 {/* CardField de Stripe */}
                 <View
@@ -224,13 +225,12 @@ export const ShoppingCar = () => {
 
             <Button
               status="success"
-              onPress={() => {
-                // Aquí irá la lógica para pagar según método
-                setShowPaymentModal(false); // Por ahora solo cierra el modal
+              onPress={async () => {
+                await handlePay(paymentMethod, name, total, clearCart);                
+                setShowPaymentModal(false);
               }}
-              style={{marginTop: 8}}
-              // disabled={paymentMethod === 'card' && !cardDetails?.complete} 
-              >
+              disabled={paymentMethod === 'card' && !cardDetails?.complete} // Opcional, para validar que la tarjeta esté completa
+              style={{marginTop: 8}}>
               {paymentMethod === 'card'
                 ? 'Pagar con tarjeta'
                 : 'Generar voucher OXXO'}
